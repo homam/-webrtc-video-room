@@ -1,22 +1,23 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const sio = require('socket.io');
+// const https = require('https');
 const favicon = require('serve-favicon');
 const compression = require('compression');
 
-const app = express(),
-  options = { 
-    key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
-    cert: fs.readFileSync(__dirname + '/rtc-video-room-cert.pem')
-  },
-  port = process.env.PORT || 3000,
-  server = process.env.NODE_ENV === 'production' ?
-    http.createServer(app).listen(port) :
-    https.createServer(options, app).listen(port),
-  io = sio(server);
+const app = express();
+const http = require('http').Server(app);
+// const options = { 
+//     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
+//     cert: fs.readFileSync(__dirname + '/rtc-video-room-cert.pem')
+// }
+const port = process.env.PORT || 3000;
+  // server = process.env.NODE_ENV === 'production' ?
+  //   http.createServer(app).listen(port) :
+  //   https.createServer(options, app).listen(port),
+  // io = sio(server);
+const io = require('socket.io')(http);
+
 // compress all requests
 app.use(compression());
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -66,3 +67,6 @@ io.sockets.on('connection', socket => {
     socket.leave(room);});
 });
 
+http.listen(port, function(){
+  console.log(`listening on *:${port}`);
+});
