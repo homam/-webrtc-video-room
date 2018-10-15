@@ -25,7 +25,8 @@ class MediaBridge extends Component {
   }
   componentDidMount() {
     this.props.getUserMedia
-      .then(stream => this.localVideo.srcObject = this.localStream = stream);
+      .then(stream => this.localVideo.srcObject = this.localStream = stream)
+      .catch(err => { alert(err.message)});
     this.props.socket.on('message', this.onMessage);
     this.props.socket.on('hangup', this.onRemoteHangup);
   }
@@ -105,7 +106,7 @@ class MediaBridge extends Component {
     // this is one of Google's public STUN servers
     // make sure your offer/answer role does not change. If user A does a SLD
     // with type=offer initially, it must do that during  the whole session
-    this.pc = new RTCPeerConnection({iceServers: [{url: 'stun:stun.l.google.com:19302'}]});
+    this.pc = new RTCPeerConnection({iceServers: [{urls: 'stun:stun.l.google.com:19302'}]});
     // when our browser gets a candidate, send it to the peer
     this.pc.onicecandidate = e => {
         console.log(e, 'onicecandidate');
@@ -146,8 +147,8 @@ class MediaBridge extends Component {
   render(){
     return (
       <div className={`media-bridge ${this.state.bridge}`}>
-        <video className="remote-video" ref={(ref) => this.remoteVideo = ref} autoPlay></video>
-        <video className="local-video" ref={(ref) => this.localVideo = ref} autoPlay muted></video>
+        <video className="remote-video" ref={(ref) => this.remoteVideo = ref} autoPlay playsInline></video>
+        <video className="local-video" ref={(ref) => this.localVideo = ref} autoPlay muted playsInline></video>
       </div>
     );
   }
